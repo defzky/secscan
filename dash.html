@@ -84,23 +84,36 @@ table tr:hover { background: rgba(255,255,255,0.03); }
   <header>
     <div><h1>🛡️ secscan</h1><span class="hostname">__HOSTNAME__</span></div>
     <nav>
-      <a href="/" class="nav-dash">📊 Dashboard</a>
-      <a href="/reports" class="nav-reports">📋 Reports</a>
-      <a href="/health" class="nav-health">❤️ Health</a>
+      <a href="/sec/" class="nav-dash">📊 Dashboard</a>
+      <a href="/sec/reports" class="nav-reports">📋 Reports</a>
+      <a href="/sec/health" class="nav-health">❤️ Health</a>
     </nav>
   </header>
   __CONTENT__
 </div>
 <div id="toast" class="toast"></div>
 <script>
+// Detect subpath prefix (/sec/ vs direct)
+var BASE = location.pathname.match('^/[a-z]+/') ? location.pathname.match('^/[a-z]+')[0] : '';
+
 // Active nav highlight
 (function() {
-  var path = location.pathname;
+  var path = location.pathname.replace(/\/$/, '');
   var links = document.querySelectorAll('nav a');
   for (var i = 0; i < links.length; i++) {
-    var href = links[i].getAttribute('href');
-    if (href === '/' && path === '/') { links[i].classList.add('active'); }
-    else if (href !== '/' && path.startsWith(href)) { links[i].classList.add('active'); }
+    var href = links[i].getAttribute('href').replace(/\/$/, '');
+    if (href === path) { links[i].classList.add('active'); }
+  }
+})();
+
+// Prefix all internal links with BASE (except nav)
+(function() {
+  var links = document.querySelectorAll('a[href^="/"]');
+  for (var i = 0; i < links.length; i++) {
+    // Skip already-prefixed links like /sec/
+    if (!links[i].href.startsWith(location.origin + BASE) && !links[i].closest('nav')) {
+      links[i].href = BASE + links[i].getAttribute('href');
+    }
   }
 })();
 </script>

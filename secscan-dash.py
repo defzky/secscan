@@ -109,7 +109,7 @@ class DashHandler(BaseHTTPRequestHandler):
             self.send_error(404)
 
     def do_POST(self):
-        if self.path == "/scan":
+        if self.path == "/scan" or self.path == "/api/scan":
             self.send_json(run_scan())
         else:
             self.send_error(404)
@@ -206,7 +206,6 @@ class DashHandler(BaseHTTPRequestHandler):
             f'{summary_html}{findings_html}{hist_html}')
         html = html.replace("__SCRIPT__", """
 <script>
-var BASE = '';
 function showToast(msg, isError) {
   var t = document.getElementById('toast');
   t.textContent = msg;
@@ -218,7 +217,7 @@ async function runScan() {
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span> Scanning...';
   try {
-    var r = await fetch('/scan', { method: 'POST' });
+    var r = await fetch(BASE + '/api/scan', { method: 'POST' });
     var d = await r.json();
     if (d.success) {
       showToast('Scan done: ' + d.data.summary.total + ' findings');
