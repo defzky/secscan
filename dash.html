@@ -3,17 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>secscan — AI Ops Security Scanner</title>
+<title>__TITLE__</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 :root { --bg: #0d1117; --card: #161b22; --border: #30363d; --text: #c9d1d9; --text-muted: #8b949e; --green: #3fb950; --yellow: #dbb700; --red: #f85149; --blue: #58a6ff; }
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height:1.5; }
 .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+header { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--border); margin-bottom: 24px; flex-wrap: wrap; gap: 8px; }
 header h1 { font-size: 1.5rem; font-weight: 600; }
 header .badge { font-size: 0.75rem; padding: 4px 10px; border-radius: 12px; background: var(--green); color: #000; font-weight: 500; }
 .hostname { color: var(--text-muted); font-size: 0.875rem; }
-.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 24px; }
+nav { display: flex; gap: 4px; }
+nav a { padding: 6px 14px; border-radius: 6px; font-size: 0.85rem; text-decoration: none; color: var(--text-muted); transition: all 0.15s; }
+nav a:hover { color: var(--text); background: var(--card); }
+nav a.active { color: var(--text); background: var(--card); border: 1px solid var(--border); font-weight: 500; }
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 24px; }
 .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
 .stat-card .number { font-size: 2rem; font-weight: 700; }
 .stat-card .label { color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
@@ -23,8 +27,6 @@ header .badge { font-size: 0.75rem; padding: 4px 10px; border-radius: 12px; back
 .stat-card.low .number { color: var(--green); }
 .stat-card.info .number { color: var(--blue); }
 .section-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-.finding-list { list-style: none; }
-.finding-item { background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 12px 16px; margin-bottom: 8px; }
 .sev-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; margin-right: 8px; }
 .sev-critical { background: #3b1d1d; color: var(--red); }
 .sev-high { background: #3b2e1d; color: #d29922; }
@@ -32,7 +34,6 @@ header .badge { font-size: 0.75rem; padding: 4px 10px; border-radius: 12px; back
 .sev-low { background: #1d3b2d; color: var(--green); }
 .sev-info { background: #1d2d3b; color: var(--blue); }
 .cat-tag { color: var(--text-muted); font-size: 0.75rem; }
-.title { font-weight: 500; margin: 4px 0; }
 .desc { color: var(--text-muted); font-size: 0.875rem; margin: 4px 0; }
 .fix { color: var(--green); font-size: 0.8rem; margin: 2px 0; }
 .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 6px; border: 1px solid var(--border); background: var(--card); color: var(--text); cursor: pointer; font-size: 0.875rem; transition: all 0.15s; text-decoration: none; }
@@ -45,7 +46,6 @@ header .badge { font-size: 0.75rem; padding: 4px 10px; border-radius: 12px; back
 .report-table th { color: var(--text-muted); font-weight: 500; }
 .dot-red { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--red); }
 .dot-yellow { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #d29922; }
-.dot-green { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
 .empty { color: var(--text-muted); text-align: center; padding: 60px; font-size: 1.1rem; }
 .severity-bar { display: flex; height: 8px; border-radius: 4px; overflow: hidden; margin: 0 0 16px; }
 .segment { height: 100%; }
@@ -59,59 +59,51 @@ table tr:hover { background: rgba(255,255,255,0.03); }
 .toast.error { background: #da3633; }
 .toast.show { display: block; animation: fadeIn 0.2s; }
 @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
-@media (max-width: 600px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+.row-critical { background: rgba(248,81,73,0.05); }
+.row-high { background: rgba(210,153,34,0.05); }
+.count-badge { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 12px; }
+.report-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; flex-wrap: wrap; gap: 8px; }
+.report-meta { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.report-host { font-weight: 600; font-size: 1.1rem; }
+.report-date, .report-dur { color: var(--text-muted); font-size: 0.85rem; }
+.health-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-bottom: 24px; }
+.health-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; display: flex; align-items: center; gap: 12px; }
+.health-indicator { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+.health-info { flex: 1; }
+.health-name { font-weight: 500; font-size: 0.95rem; }
+.health-status { font-size: 0.85rem; font-weight: 600; }
+.stat-sub { color: var(--text-muted); font-size: 0.75rem; }
+.cat-section { margin-bottom: 16px; }
+.cat-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-weight: 600; font-size: 0.95rem; }
+.cat-icon { font-size: 1.1rem; }
+@media (max-width: 600px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } nav { width: 100%; overflow-x: auto; } }
 </style>
 </head>
 <body>
 <div class="container">
   <header>
     <div><h1>🛡️ secscan</h1><span class="hostname">__HOSTNAME__</span></div>
-    <span class="badge">● Live</span>
+    <nav>
+      <a href="/" class="nav-dash">📊 Dashboard</a>
+      <a href="/reports" class="nav-reports">📋 Reports</a>
+      <a href="/health" class="nav-health">❤️ Health</a>
+    </nav>
   </header>
-
-  <div class="actions">
-    <button class="btn btn-primary" onclick="runScan()" id="scanBtn">🔄 Run Scan</button>
-    <a class="btn" href="/sec/api/reports" target="_blank">📋 Reports API</a>
-    <a class="btn" href="/sec/api/health" target="_blank">❤️ Health</a>
-  </div>
-
-  __SUMMARY__
-
-  __FINDINGS__
-
-  __HISTORY__
+  __CONTENT__
 </div>
-
 <div id="toast" class="toast"></div>
-
 <script>
-var BASE = '/sec';
-
-function showToast(msg, isError) {
-  var t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast' + (isError ? ' error' : '') + ' show';
-  setTimeout(function() { t.classList.remove('show'); }, 4000);
-}
-async function runScan() {
-  var btn = document.getElementById('scanBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> Scanning...';
-  try {
-    var r = await fetch(BASE + '/api/scan', { method: 'POST' });
-    var d = await r.json();
-    if (d.success) {
-      showToast('Scan done: ' + d.data.summary.total + ' findings');
-      setTimeout(function() { location.reload(); }, 1000);
-    } else {
-      showToast('Scan failed', true);
-    }
-  } catch(e) {
-    showToast('Error: ' + e.message, true);
+// Active nav highlight
+(function() {
+  var path = location.pathname;
+  var links = document.querySelectorAll('nav a');
+  for (var i = 0; i < links.length; i++) {
+    var href = links[i].getAttribute('href');
+    if (href === '/' && path === '/') { links[i].classList.add('active'); }
+    else if (href !== '/' && path.startsWith(href)) { links[i].classList.add('active'); }
   }
-  btn.disabled = false;
-  btn.innerHTML = '🔄 Run Scan';
-}
+})();
 </script>
+__SCRIPT__
 </body>
 </html>
