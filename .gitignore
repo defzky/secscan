@@ -1,0 +1,5 @@
+target/
+.learnings/
+**/.DS_Store
+*.swp
+*.swo

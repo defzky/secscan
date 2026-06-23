@@ -1,0 +1,13 @@
+[Unit]
+Description=secscan - Daily CLI Security Scan
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/secscan --output /var/lib/secscan/reports/scan-$(date +\%Y\%m\%d).json
+MemoryMax=200M
+CPUQuota=50%
+AmbientCapabilities=CAP_NET_RAW
+
+[Install]
+WantedBy=multi-user.target

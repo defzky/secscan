@@ -1,0 +1,15 @@
+[Unit]
+Description=secscan-dash - Security Scanner Dashboard
+After=network.target secscan.service
+Requires=secscan.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /home/ubuntu/.openclaw/workspace/secscan/secscan-dash.py
+Restart=always
+RestartSec=5
+User=root
+MemoryMax=100M
+
+[Install]
+WantedBy=multi-user.target

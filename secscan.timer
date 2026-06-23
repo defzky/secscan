@@ -1,0 +1,11 @@
+[Unit]
+Description=secscan - Daily Security Scan
+After=secscan.service
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+RandomizedDelaySec=3600
+
+[Install]
+WantedBy=timers.target

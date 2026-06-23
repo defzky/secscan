@@ -1,0 +1,17 @@
+[Unit]
+Description=secscan - AI Ops Security Scanner API
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/secscan --serve 9090
+Restart=always
+RestartSec=5
+User=root
+MemoryMax=200M
+CPUQuota=50%
+# Port scan can use network
+AmbientCapabilities=CAP_NET_RAW
+
+[Install]
+WantedBy=multi-user.target
